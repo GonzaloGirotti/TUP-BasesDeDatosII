@@ -1,0 +1,27 @@
+  db.createCollection("cursos")
+
+  db.cursos.insertMany([
+    { _id: 1, nombre: "Matematica" },
+    { _id: 2, nombre: "Historia" },
+    { _id: 3, nombre: "Biologia" }
+  ])
+  
+  db.createCollection("alumnos")
+
+  db.alumnos.insertMany([
+    {
+      nombre: "Pedro",
+      id_curso: [1, 3]
+    },
+    {
+      nombre: "Carlos",
+      id_curso: [2]
+    },
+    {
+      nombre: "Lucia",
+      id_curso: [1, 2, 3]
+    }
+  ])
+  db.cursos.find({ nombre:"Matematica"})
+
+  db.alumnos.find({ nombre:"Pedro"})
