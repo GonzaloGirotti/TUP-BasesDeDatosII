@@ -1,0 +1,6 @@
+use('mongodbVSCodePlaygroundDB');
+db.clientes.createIndex({ nombre: 1, apellido: 1 })
+
+db.clientes.insertOne({nombre: "Juan", apellido: "Gomez"})
+
+db.clientes.find({ nombre: "Juan", apellido: "Gomez" })
