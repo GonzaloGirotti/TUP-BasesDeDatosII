@@ -1,0 +1,9 @@
+Replica Set:
+Usar un Replica Set permite tener copias idénticas de los datos en varios servidores.
+ La ventaja principal es que, si uno falla, otro puede tomar su lugar, garantizando disponibilidad 
+ y continuidad del servicio.
+
+Sharding:
+El sharding divide la base de datos en fragmentos distribuidos entre varios servidores.
+Esto es útil en bases de datos de alto volumen porque mejora el rendimiento y 
+permite escalar horizontalmente, manejando grandes cantidades de datos 
