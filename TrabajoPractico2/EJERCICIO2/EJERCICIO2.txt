@@ -1,0 +1,8 @@
+//Ejercicio 2
+use('empresa');
+db.empleados.find({
+    $and: [
+        { edad: { $gte: 25 } },
+        { edad: { $lte: 40 } }
+    ]
+});
