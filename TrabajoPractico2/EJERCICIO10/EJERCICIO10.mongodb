@@ -1,0 +1,24 @@
+use('empresa');
+
+//CREAR EL USUARIO:
+ db.createUser({
+    user: "usuario_empresario",
+    pwd: "empresario_n0rm4l",
+    roles:[
+        {role: "readwrite", db: "empresa"}
+    ]
+ });
+
+ //COMANDOS PARA BACKUP Y RESTORE:
+
+ /*   BACKUP:
+
+   mongodump --host="ingresarTuConnectionString" --port:27017 --out=/ruta/al/directorio <otras opciones>
+ 
+ */   
+
+/*   RESTORE:
+
+   mongorestore --host="ingresarTuConnectionString" --port=3017 /ruta/del/dump
+ 
+ */   

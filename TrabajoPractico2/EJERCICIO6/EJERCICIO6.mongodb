@@ -1,4 +1,4 @@
-use('mongodbVSCodePlaygroundDB');
+use('empresa');
 db.clientes.createIndex({ nombre: 1, apellido: 1 })
 
 db.clientes.insertOne({nombre: "Juan", apellido: "Gomez"})
