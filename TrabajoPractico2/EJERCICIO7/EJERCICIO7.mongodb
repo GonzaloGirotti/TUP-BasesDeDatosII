@@ -1,12 +1,14 @@
-  db.createCollection("cursos")
+  use('empresa');
+  
+  db.createCollection("cursos");
 
   db.cursos.insertMany([
     { _id: 1, nombre: "Matematica" },
     { _id: 2, nombre: "Historia" },
     { _id: 3, nombre: "Biologia" }
-  ])
+  ]);
   
-  db.createCollection("alumnos")
+  db.createCollection("alumnos");
 
   db.alumnos.insertMany([
     {
@@ -22,6 +24,6 @@
       id_curso: [1, 2, 3]
     }
   ])
-  db.cursos.find({ nombre:"Matematica"})
+  db.cursos.find({ nombre:"Matematica"});
 
-  db.alumnos.find({ nombre:"Pedro"})
+  db.alumnos.find({ nombre:"Pedro"});

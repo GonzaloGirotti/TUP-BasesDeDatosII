@@ -1,0 +1,10 @@
+use('empresa');
+
+db.createCollection("ventas");
+
+db.ventas.insertMany([
+    {producto: "Mouse", cantidad: "10", precio_unitario: "25000"}, 
+    {producto: "Teclado", cantidad: "5", precio_unitario: "15000"},
+    {producto: "Disco_Duro", cantidad: "3", precio_unitario: "90000"}, 
+    {producto: "Monitor", cantidad: "20", precio_unitario: "100000"}
+]);
