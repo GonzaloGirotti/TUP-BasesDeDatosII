@@ -1,0 +1,35 @@
+use('tiendaOnline');
+
+/*
+
+Ejercicio 2: Agrupación y agregación con $group
+Objetivo:
+
+Utilizar $group para agrupar documentos y aplicar operadores de acumulación.
+Tarea:
+
+    Calcular el precio promedio, máximo y mínimo por categoría de producto.
+    Obtener el total de ventas por país del cliente, incluyendo la cantidad de transacciones y el monto total.
+
+*/
+
+
+/* PRECIOS PROMEDIO, MAXIMO Y MINIMO POR CATEGORIA:  */ 
+
+db.productos.aggregate({
+    $group:
+    {   _id: "$categoria", 
+        "precio_promedio" : {$avg: "$precio"},
+        "precio_maximo" : {$max: "$precio"},
+        "precio_minimo" : {$min: "$precio"}
+    }
+});
+
+db.ventas.aggregate({
+    $group:
+    {   _id: "$cliente.pais",
+        "total_de_ventas": {$sum: 1},
+        "cantidad_transacciones": {$sum: "$cantidad"},
+        "monto_total" : {$sum : "$total"}
+    }
+});
