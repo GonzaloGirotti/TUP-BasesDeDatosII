@@ -4,7 +4,7 @@ db.productos.aggregate
 ([
     {$unwind: "$valoraciones"}, // Deconstruye el array de documentos llamado "valoraciones" en múltiples documentos.
     
-    {$group: //Agrega los campos "cantidad_valoraciones" el cual es la suma de los documentos en "valoraciones"
+    {$group: //Agrega dos campos: "cantidad_valoraciones" el cual es la cantidad de documentos en el array"valoraciones"
             //de cada producto, y "promedio_valoraciones" que es el promedio de todas las calificaciones del producto.
             //A los demas campos (nombre, categoria, etc.) les asigna el valor de ese campo del primer producto
             // que entra en el group (con $first).
