@@ -1,0 +1,37 @@
+use('tiendaOnline');
+
+/*
+Ejercicio 4: Deconstrucción de arrays con $unwind
+Objetivo:
+
+Comprender y aplicar $unwind para trabajar con arrays.
+Tarea:
+
+    Deconstruir el array de valoraciones de productos para obtener una lista plana 
+    donde cada documento contenga una valoración individual.
+    Luego, agrupar por puntuación y contar cuántas valoraciones hay de cada puntuación.
+
+Etapas del Pipeline:
+
+$unwind, $group, $sort
+*/
+
+/* ====================================================== */
+
+// Documentos con valoracion individual: 
+
+db.productos.aggregate(
+    {$unwind: "$valoraciones"}
+);
+
+// Agrupar por puntuacion y contar la cantidad de valoraciones de cada puntuacion:
+
+db.productos.aggregate([
+    {$unwind: "$valoraciones"},
+    {
+        $group:
+        {_id: "$valoraciones.puntuacion",
+         cantidad_valoraciones: {$sum: 1}
+        }
+    }
+]);
