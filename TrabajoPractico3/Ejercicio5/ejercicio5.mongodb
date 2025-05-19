@@ -1,0 +1,32 @@
+use ("tiendaOnline")
+
+db.ventas.aggregate([
+    {
+        $lookup: {
+            from: "productos",
+            localField: "producto_id",
+            foreignField: "_id",
+            as: "info_producto"
+        }
+    },
+    {
+        $unwind: "$info_producto"
+    },
+    {
+        $project: {
+            _id: 1,
+            "cliente.nombre": 1,
+            "info_producto.nombre": 1,
+            "info_producto.categoria": 1,
+            cantidad: 1,
+            precio_unitario: 1,
+            total: 1
+        },
+    },
+    {
+        $group: {
+            _id: "$info_producto.categoria",
+            total_vendido: { $sum: "$total" }
+        }
+    }
+])
