@@ -1,12 +1,12 @@
 
-  //lookup convina alumnos con cursos
+  //lookup combina alumnos con cursos
 
 
-db.alumnosEJ8.aggregate([
+db.alumnos.aggregate([
     {
       $lookup: {
-        from: "cursosEJ8",
-        localField: "curso_id",
+        from: "cursos",
+        localField: "id_curso",
         foreignField: "_id",
         as: "curso_info"
       }
@@ -18,7 +18,7 @@ db.alumnosEJ8.aggregate([
       $project: {
         _id: 0,
         nombre: 1,
-        curso: "$curso_info.nombre_curso"
+        curso: "$curso_info.nombre"
       }
     }
-  ])
+  ]);

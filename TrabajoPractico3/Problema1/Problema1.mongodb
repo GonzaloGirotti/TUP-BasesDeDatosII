@@ -1,0 +1,30 @@
+use('tiendaOnline');
+
+db.productos.aggregate
+([
+    {$unwind: "$valoraciones"}, // Deconstruye el array de documentos llamado "valoraciones" en múltiples documentos.
+    
+    {$group: //Agrega dos campos: "cantidad_valoraciones" el cual es la cantidad de documentos en el array"valoraciones"
+            //de cada producto, y "promedio_valoraciones" que es el promedio de todas las calificaciones del producto.
+            //A los demas campos (nombre, categoria, etc.) les asigna el valor de ese campo del primer producto
+            // que entra en el group (con $first).
+        {
+        _id: "$_id",
+        nombre: {$first: "$nombre"},
+        categoria: {$first: "$categoria"},
+        precio: {$first: "$precio"},
+        stock: {$first: "$stock"},
+        características: {$first: "$características"},
+        proveedor: {$first: "$proveedor"},
+        fecha_ingreso: {$first: "$fecha_ingreso"},
+        cantidad_valoraciones: {$sum: 1},
+        promedio_valoraciones: {$avg: "$valoraciones.puntuacion"}
+        }
+    },
+    {$match:    //Solo devuelve los productos que matcheen con tener 2 o mas documentos en su array "valoraciones".
+        {cantidad_valoraciones: {$gte: 2}}
+    },
+    {$sort: //Ordena el resultado segun los promedios de calificaciones, en orden descendente.
+        {promedio_valoraciones: -1}
+    }
+]);
