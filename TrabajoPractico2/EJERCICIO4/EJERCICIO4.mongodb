@@ -1,5 +1,6 @@
 use('empresa');
 
-db.empleados.aggregate([{$addFields: {direccion: [{calle:"Calle Buenavista 123", ciudad: "Felicidad City",
-    codigo_postal: "F4356"
-}]}}]);
+db.empleados.updateMany(
+    {edad: {$gt: 0}}, {$set: {direccion: [{calle:"Calle Buenavista 123", ciudad: "Felicidad City",
+    codigo_postal: "F4356"}]}}
+);

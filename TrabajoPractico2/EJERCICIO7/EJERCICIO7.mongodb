@@ -23,7 +23,8 @@
       nombre: "Lucia",
       id_curso: [1, 2, 3]
     }
-  ])
-  db.cursos.find({ nombre:"Matematica"});
+  ]);
+  // db.cursos.find({ nombre:"Matematica"});
+  db.cursos.find();
 
-  db.alumnos.find({ nombre:"Pedro"});
+  // db.alumnos.find({ nombre:"Pedro"});
