@@ -1,0 +1,25 @@
+use ("tiendaOnline");
+
+db.productos.aggregate([
+    {
+        $project: {
+            _id: 0,
+            nombre: 1,
+            precio: 1,
+            precio_con_iva: { $multiply: ["$precio", 1.21] },
+        }
+    }
+]);
+
+db.ventas.aggregate([
+    {
+        $project: {
+            _id:1,
+            cliente:{
+                nombre:1
+            },
+            total: 1,
+            descuento: { $multiply: ["$total", 0.1] }
+        }
+    }
+]);
