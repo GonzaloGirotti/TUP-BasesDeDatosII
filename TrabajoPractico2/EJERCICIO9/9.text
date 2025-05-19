@@ -6,4 +6,4 @@ Usar un Replica Set permite tener copias idénticas de los datos en varios servi
 Sharding:
 El sharding divide la base de datos en fragmentos distribuidos entre varios servidores.
 Esto es útil en bases de datos de alto volumen porque mejora el rendimiento y 
-permite escalar horizontalmente, manejando grandes cantidades de datos y consultas de forma eficiente.
+permite escalar horizontalmente, manejando grandes cantidades de datos 
