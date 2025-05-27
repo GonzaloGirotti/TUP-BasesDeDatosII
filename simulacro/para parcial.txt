@@ -1,0 +1,150 @@
+Guía de Aggregate https://aulavirtual.frbb.utn.edu.ar/mod/page/view.php?id=409360
+Expresiones regulares https://aulavirtual.frbb.utn.edu.ar/mod/page/view.php?id=408862
+Guía básica de MongoDB https://aulavirtual.frbb.utn.edu.ar/mod/page/view.php?id=409092
+
+Guía básica de MongoDB : metodos  find, delete ,update, agregate y lista de operadores ejemplos{$eq, lte}, op logicos
+
+Expresiones regulares :   Métodos principales{regex.test(cadena)// Devuelve true si hay coincidencia} , Caracteres Especiales
+
+Guía de Aggregate : 
+		$match
+			Filtra documentos, similar a una consulta find().
+				{ $match: { status: "activo", edad: { $gt: 25 } } }
+------------------------------------------------------------------------------------------------
+		 $group
+			Agrupa documentos por campos específicos y aplica operadores de acumulación.
+				{ $group: { 
+					_id: "$departamento", 
+					totalEmpleados: { $sum: 1 },
+					salarioPromedio: { $avg: "$salario" } 
+				} }
+------------------------------------------------------------------------------------------------
+		$project
+			Modifica la estructura de los documentos (proyección).
+				{ $project: { 
+					nombre: 1, 
+					apellido: 1, 
+					nombreCompleto: { $concat: ["$nombre", " ", "$apellido"] },
+					_id: 0 
+				} }
+------------------------------------------------------------------------------------------------
+		$sort
+			Ordena los documentos.
+				{ $sort: { edad: -1, nombre: 1 } }
+------------------------------------------------------------------------------------------------
+		$limit y $skip  
+			Limita el número de documentos o salta un número específico.  
+				{ $limit: 10 }  
+				{ $skip: 20 }  
+------------------------------------------------------------------------------------------------
+		$unwind  
+			Deconstruye un array en múltiples documentos.  
+				{ $unwind: "$tags" }  
+------------------------------------------------------------------------------------------------
+		$lookup  
+			Realiza un "join" con otra colección (similar a LEFT OUTER JOIN).  
+				{ $lookup: {  
+					from: "inventario",  
+					localField: "item",  
+					foreignField: "sku",  
+					as: "inventario_docs"  
+				} }  
+------------------------------------------------------------------------------------------------
+		$addFields  
+			Añade nuevos campos a los documentos.  
+				{ $addFields: {  
+					totalPrecio: { $multiply: ["$precio", "$cantidad"] }  
+				} }  
+------------------------------------------------------------------------------------------------
+		$facet  
+			Permite procesamiento paralelo de múltiples pipelines.  
+				{ $facet: {  
+					"categorizacionPorEdad": [  
+						{ $match: { edad: { $exists: true } } },  
+						{ $bucket: { groupBy: "$edad", boundaries: [18, 30, 40, 50, 60, 70] } }  
+					],  
+					"topVentas": [  
+						{ $sort: { ventas: -1 } },  
+						{ $limit: 5 }  
+					]  
+				} }  
+------------------------------------------------------------------------------------------------
+
+
+Operadores de acumulación comunes
+	$sum
+		Calcula la suma de valores numéricos.
+
+			{ $sum: "$precio" }  // suma el campo precio
+			{ $sum: 1 }          // cuenta documentos
+------------------------------------------------------------------------------------------------			
+	$avg
+		Calcula el promedio.
+
+			{ $avg: "$calificacion" }
+------------------------------------------------------------------------------------------------	
+	$min y $max
+		Encuentra valores mínimos o máximos.
+
+			{ $min: "$fecha" }
+			{ $max: "$puntuacion" }
+------------------------------------------------------------------------------------------------
+	$first y $last
+		Obtiene el primer o último valor de un grupo.
+
+			{ $first: "$nombre" }
+			{ $last: "$comentario" }
+------------------------------------------------------------------------------------------------
+	$push
+		Crea arrays con los valores de un campo en un grupo.
+
+			{ $push: "$tag" }  // crea un array con todos los valores de "tag"
+------------------------------------------------------------------------------------------------
+	$addToSet
+		Similar a $push pero sin duplicados.
+
+			{ $addToSet: "$categoria" }
+------------------------------------------------------------------------------------------------
+Operadores de expresión
+	Operadores aritméticos
+		{ $add: [<expr1>, <expr2>, ...] }
+		{ $subtract: [<expr1>, <expr2>] }
+		{ $multiply: [<expr1>, <expr2>, ...] }
+		{ $divide: [<expr1>, <expr2>] }
+------------------------------------------------------------------------------------------------
+	Operadores de fecha
+		{ $year: <fechaExpr> }
+		{ $month: <fechaExpr> }
+		{ $dayOfMonth: <fechaExpr> }
+		{ $dayOfWeek: <fechaExpr> }
+------------------------------------------------------------------------------------------------
+	Operadores condicionales
+		{ $cond: { if: <condición>, then: <resultado-true>, else: <resultado-false> } }
+		{ $switch: {
+			branches: [
+				{ case: <condición1>, then: <resultado1> },
+				{ case: <condición2>, then: <resultado2> }
+			],
+			default: <resultadoPorDefecto>
+		} }
+------------------------------------------------------------------------------------------------
+	Operadores de array
+		{ $size: <arrayExpr> }
+		{ $filter: { input: <array>, as: <string>, cond: <expresión> } }
+		{ $map: { input: <array>, as: <string>, in: <expresión> } }
+------------------------------------------------------------------------------------------------
+Consejos de rendimiento
+	1.Colocar $match lo más temprano posible en el pipeline
+	2.Usar $project para eliminar campos innecesarios temprano
+	3.Combinar múltiples $match en una sola etapa cuando sea posible
+	4.Considerar índices compuestos para operaciones complejas
+------------------------------------------------------------------------------------------------
+Conclusión
+	La agregación en MongoDB es una herramienta poderosa para el análisis de datos, 
+	transformaciones complejas y generación de reportes. Dominar el framework de agregación permite 
+	aprovechar al máximo las capacidades analíticas de MongoDB
+ 	sin necesidad de extraer los datos a otras herramientas.
+
+
+
+
