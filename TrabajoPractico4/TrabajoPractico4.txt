@@ -1,0 +1,455 @@
+// Ejercicio 1:
+
+-- REQUISITOS:
+
+Modelar un sistema donde: - Cada Empleado pertenece a un Departamento . 
+- Los Proyectos pueden tener asignados múltiples empleados con horas semanales. 
+- Un empleado puede liderar uno o varios proyectos.
+
+-- ACTIVIDADES:
+
+    Modelado - Crear nodos y relaciones con ejemplos de datos:
+        Al menos 3 empleados en diferentes departamentos.
+        2 proyectos.
+        Asignaciones de horas semanales.
+        Un líder por proyecto.
+
+    Consultas:
+    - Obtener el nombre del proyecto, su líder y los empleados asignados. }
+    - Calcular el total de horas semanales por proyecto. 
+    - Listar los empleados que trabajan en más de un proyecto.
+
+-- MODELADO:
+
+CREATE
+(Sistemas:Departamento {nombre_depto:"Sistemas"}),
+(RR_Humanos:Departamento {nombre_depto:"Desarrolladores"}),
+(Marketing:Departamento {nombre_depto:"Testing"}),
+(web_app:Proyecto {titulo_proyecto: "Aplicacion Web"}),
+(rest_api:Proyecto {titulo_proyecto: "API Rest"}),
+(juana:Empleado {nombre: "Juana", horas_semanales: 48}),
+(juan:Empleado {nombre: "Juan", horas_semanales: 36}),
+(pablo:Empleado {nombre: "Pablo", horas_semanales: 50})
+
+
+
+MATCH ((e:Empleado) WHERE(e.nombre="Juan")), ((d:Departamento) 
+WHERE (d.nombre_depto="Testing")) MERGE (e)-[:PERTENECE_A]->(d);
+
+MATCH ((e:Empleado) WHERE(e.nombre="Juana")), ((d:Departamento) 
+WHERE (d.nombre_depto="Sistemas")) MERGE (e)-[:PERTENECE_A]->(d);
+
+MATCH ((e:Empleado) WHERE(e.nombre="Pablo")), ((d:Departamento) 
+WHERE (d.nombre_depto="Desarrolladores")) MERGE (e)-[:PERTENECE_A]->(d);
+
+
+
+MATCH ((e:Empleado) WHERE(e.nombre="Juan")), ((p:Proyecto) 
+WHERE (p.titulo_proyecto="API Rest")) MERGE (e)-[:PROYECTO_ASIGNADO]->(p);
+
+MATCH ((e:Empleado) WHERE(e.nombre="Juan")), ((p:Proyecto) 
+WHERE (p.titulo_proyecto="Aplicacion Web")) MERGE (e)-[:PROYECTO_ASIGNADO]->(p);
+
+MATCH ((e:Empleado) WHERE(e.nombre="Pablo")), ((p:Proyecto) 
+WHERE (p.titulo_proyecto="Aplicacion Web")) MERGE (e)-[:PROYECTO_ASIGNADO]->(p);
+
+MATCH ((e:Empleado) WHERE(e.nombre="Juana")), ((p:Proyecto) 
+WHERE (p.titulo_proyecto="API Rest")) MERGE (e)-[:PROYECTO_ASIGNADO]->(p);
+
+
+
+MATCH((p:Proyecto) WHERE(p.titulo_proyecto="API Rest")), ((e:Empleado) WHERE (e.nombre="Juan")) 
+SET p.lider=e.nombre;
+
+MATCH((p:Proyecto) WHERE(p.titulo_proyecto="Aplicacion Web")), ((e:Empleado) WHERE (e.nombre="Pablo")) 
+SET p.lider=e.nombre;
+
+
+
+-- CONSULTAS:
+MATCH(e:Empleado)-[r:PROYECTO_ASIGNADO]-(p:Proyecto) RETURN e.nombre, r, p.titulo_proyecto, p.lider;
+
+MATCH(e:Empleado)-[:PROYECTO_ASIGNADO]->(p:Proyecto) WITH e, 
+count(p) AS num_proyectos_asignados WHERE num_proyectos_asignados > 1 MATCH (e)-[:PROYECTO_ASIGNADO]->(proyecto) 
+RETURN e.nombre, num_proyectos_asignados, collect(proyecto.titulo_proyecto) as proyectos;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ejercicio 2
+
+-- REQUISITOS:
+
+Modelar un sistema de préstamos donde: 
+- Estudiantes piden libros prestados. 
+- Cada libro pertenece a una Categoría . 
+- Las relaciones de préstamo tienen fecha y estado ( "Activo" o "Devuelto" ). 
+- Cada estudiante pertenece a una Carrera .
+
+-- ACTIVIDADES:
+
+    Modelado - Crear datos con al menos:
+        3 estudiantes de distintas carreras.
+        4 libros de categorías diferentes.
+        5 préstamos con fechas y estado.
+
+    Consultas:
+    - Obtener todos los libros actualmente prestados (estado "Activo" ). 
+    - Listar cuántos libros ha pedido prestado cada estudiante. 
+    - Mostrar las categorías con más préstamos activos. 
+    - Encontrar los estudiantes que no tienen préstamos activos.
+
+-- MODELADO:
+
+CREATE(juan:Alumno {nombre: "Juan", apellido: "Gomez"}),
+(gonzalo:Alumno {nombre: "Gonzalo", apellido: "Perez"}),
+(santiago:Alumno {nombre: "Santiago", apellido: "Alvarez"}),
+(medicina: Carrera {titulo_carrera: "Medicina"}),
+(ingenieria: Carrera {titulo_carrera: "Ingenieria"}),
+(enfermeria: Carrera {titulo_carrera: "Enfermeria"}),
+(harry_potter: Libro {titulo_libro: "Harry Potter", categoria: "Magia"}),
+(cronicas_venado: Libro {titulo_libro: "Los dias del Venado", categoria: "Mitologia"}),
+(cien_anios: Libro {titulo_libro: "100 años de soledad", categoria: "Antiguedad"}),
+(clean_code: Libro {titulo_libro: "Clean code", categoria: "Programacion"});
+
+MATCH((a:Alumno) WHERE (a.nombre="Gonzalo")), 
+((l:Libro) WHERE (l.titulo_libro="Harry Potter"))
+MERGE (a)-[:TOMO_PRESTADO {fecha: '25/2/2025', estado: "Activo"}]->(l);
+
+MATCH((a:Alumno) WHERE (a.nombre="Juan")), 
+((l:Libro) WHERE (l.titulo_libro="Harry Potter")) 
+MERGE (a)-[:TOMO_PRESTADO {fecha: "30/6/2024", estado: "Devuelto"}]->(l);
+
+MATCH((a:Alumno) WHERE (a.nombre="Juan")), 
+((l:Libro) WHERE (l.titulo_libro="100 años de soledad")) 
+MERGE (a)-[:TOMO_PRESTADO {fecha: "22/8/2025", estado: "Devuelto"}]->(l);
+
+MATCH((a:Alumno) WHERE (a.nombre="Santiago")), 
+((l:Libro) WHERE (l.titulo_libro="Los dias del Venado")) 
+MERGE (a)-[:TOMO_PRESTADO {fecha: "30/11/2024", estado: "Activo"}]->(l);
+
+MATCH((a:Alumno) WHERE (a.nombre="Santiago")), 
+((l:Libro) WHERE (l.titulo_libro="Harry Potter")) 
+MERGE (a)-[:TOMO_PRESTADO {fecha: "20/5/2024", estado: "Activo"}]->(l);
+
+-- CONSULTAS:
+
+MATCH (a:Alumno)-[r:TOMO_PRESTADO]-(l:Libro) 
+WHERE r.estado="Activo" 
+return a.nombre AS Nombre_Alumno, 
+l.titulo_libro AS Titulo_Libro, 
+r.estado AS Estado_Prestamo;
+
+MATCH (a:Alumno)-[r:TOMO_PRESTADO]-(l:Libro) 
+RETURN a.nombre as Nombre_Alumno, count(*) AS Cantidad_Libros_Pedidos
+
+MATCH (a:Alumno)-[r:TOMO_PRESTADO]-(l:Libro) WHERE r.estado="Activo" 
+RETURN l.categoria AS Categoria_Libro, count(*) AS Cantidad_Prestamos_Activos
+
+MATCH (a:Alumno)
+OPTIONAL MATCH (a)-[r:TOMO_PRESTADO]->(l:Libro)
+WHERE r.estado = "Activo"
+WITH a, count(r) AS Prestamos_Activos
+WHERE Prestamos_Activos = 0
+RETURN a.nombre, Prestamos_Activos;
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ejercicio 3
+
+-- REQUISITOS:
+
+Crear una red donde: 
+- Usuarios se conectan con otros usuarios mediante relaciones CONOCE . 
+- Los usuarios publican Posts con fecha de publicación. 
+- Cada usuario puede tener diferentes Habilidades , que otros pueden endosar.
+
+-- ACTIVIDADES:
+
+    Modelado - Insertar datos de:
+
+        4 usuarios con conexiones entre ellos.
+        3 posts de distintos usuarios.
+        Al menos 2 habilidades por usuario, con algunos endosos.
+
+    Consultas:
+    - Listar los usuarios con más conexiones ( COUNT ). 
+    - Obtener los 2 usuarios con más publicaciones. 
+    - Mostrar las habilidades más endosadas en total. 
+    - Para un usuario específico, listar las habilidades que aún no ha endosado a otros.
+
+
+-- MODELADO:
+
+
+CREATE (u1:Usuario {nombre: 'Juan Pérez', nombre_usuario: 'juanp', mail: 'juan@mail.com'}),
+(u2:Usuario {nombre: 'María Gómez', nombre_usuario: 'mariag', mail: 'maria@mail.com'}),
+(u3:Usuario {nombre: 'Luis Torres', nombre_usuario: 'luist', mail: 'luis@mail.com'}),
+(u4:Usuario {nombre: 'Ana Rivas', nombre_usuario: 'anar', mail: 'ana@mail.com'});
+
+
+MATCH((u1:Usuario) WHERE (u1.nombre_usuario="juanp")), 
+((u2:Usuario) WHERE (u2.nombre_usuario="mariag"))
+MERGE (u1)-[r:CONOCE]->(u2);
+
+MATCH((u1:Usuario) WHERE (u1.nombre_usuario="juanp")), 
+((u2:Usuario) WHERE (u2.nombre_usuario="luist"))
+MERGE (u1)-[r:CONOCE]->(u2);
+
+MATCH((u1:Usuario) WHERE (u1.nombre_usuario="juanp")), 
+((u2:Usuario) WHERE (u2.nombre_usuario="anar"))
+MERGE (u1)-[r:CONOCE]->(u2);
+
+MATCH((u1:Usuario) WHERE (u1.nombre_usuario="mariag")), 
+((u2:Usuario) WHERE (u2.nombre_usuario="luist"))
+MERGE (u1)-[r:CONOCE]->(u2);
+
+MATCH((u1:Usuario) WHERE (u1.nombre_usuario="mariag")), 
+((u2:Usuario) WHERE (u2.nombre_usuario="anar"))
+MERGE (u1)-[r:CONOCE]->(u2);
+
+MATCH((u1:Usuario) WHERE (u1.nombre_usuario="luist")), 
+((u2:Usuario) WHERE (u2.nombre_usuario="anar"))
+MERGE (u1)-[r:CONOCE]->(u2);
+
+
+CREATE (p1:Post {texto: '¡Hola mundo!', fecha_publicacion: date('2025-07-01')}),
+(p2:Post {texto: 'Bienvenidos a todos!', fecha_publicacion: date('2025-07-02')}),
+(p3:Post {texto: 'Siempre listos!', fecha_publicacion: date('2025-07-03')});
+
+
+MATCH((u:Usuario) WHERE (u.nombre_usuario="mariag")), 
+((p:Post) WHERE (p.texto="¡Hola mundo!"))
+MERGE (u)-[r:PUBLICÓ]->(p);
+
+MATCH((u:Usuario) WHERE (u.nombre_usuario="mariag")), 
+((p:Post) WHERE (p.texto="Siempre listos!"))
+MERGE (u)-[r:PUBLICÓ]->(p);
+
+MATCH((u:Usuario) WHERE (u.nombre_usuario="luist")), 
+((p:Post) WHERE (p.texto="Siempre listos!"))
+MERGE (u)-[r:PUBLICÓ]->(p);
+
+MATCH((u:Usuario) WHERE (u.nombre_usuario="luist")), 
+((p:Post) WHERE (p.texto="¡Hola mundo!"))
+MERGE (u)-[r:PUBLICÓ]->(p);
+
+MATCH((u:Usuario) WHERE (u.nombre_usuario="luist")), 
+((p:Post) WHERE (p.texto="Bienvenidos a todos!"))
+MERGE (u)-[r:PUBLICÓ]->(p);
+
+MATCH((u:Usuario) WHERE (u.nombre_usuario="juanp")), 
+((p:Post) WHERE (p.texto="Bienvenidos a todos!"))
+MERGE (u)-[r:PUBLICÓ]->(p);
+
+CREATE(h1:Habilidad {nombre: "Java"}),
+(h2:Habilidad {nombre: "SQL"}),
+(h3:Habilidad {nombre: "Python"}),
+(h4:Habilidad {nombre: "C++"}),
+(h5:Habilidad {nombre: "MongoDB"}),
+(h6:Habilidad {nombre: "BASH"}),
+(h7:Habilidad {nombre: "Linux"}),
+(h8:Habilidad {nombre: "Arduino"});
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="juanp")), 
+((h1:Habilidad) WHERE (h1.nombre="Java")),
+((h2:Habilidad) WHERE (h2.nombre="SQL"))
+MERGE (u)-[:HABILIDOSO_EN]->(h1)
+MERGE (u)-[:HABILIDOSO_EN]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="mariag")), 
+((h1:Habilidad) WHERE (h1.nombre="Python")),
+((h2:Habilidad) WHERE (h2.nombre="C++"))
+MERGE (u)-[:HABILIDOSO_EN]->(h1)
+MERGE (u)-[:HABILIDOSO_EN]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="anar")), 
+((h1:Habilidad) WHERE (h1.nombre="MongoDB")),
+((h2:Habilidad) WHERE (h2.nombre="BASH"))
+MERGE (u)-[:HABILIDOSO_EN]->(h1)
+MERGE (u)-[:HABILIDOSO_EN]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="luist")), 
+((h1:Habilidad) WHERE (h1.nombre="Linux")),
+((h2:Habilidad) WHERE (h2.nombre="Arduino"))
+MERGE (u)-[:HABILIDOSO_EN]->(h1)
+MERGE (u)-[:HABILIDOSO_EN]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="luist")),
+((h1:Habilidad) WHERE (h1.nombre="MongoDB")),
+((h2:Habilidad) WHERE (h2.nombre="BASH"))
+MERGE (u)-[:ENDOSA]->(h1)
+MERGE (u)-[:ENDOSA]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="anar")),
+((h1:Habilidad) WHERE (h1.nombre="MongoDB")),
+((h2:Habilidad) WHERE (h2.nombre="BASH"))
+MERGE (u)-[:ENDOSA]->(h1)
+MERGE (u)-[:ENDOSA]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="mariag")),
+((h1:Habilidad) WHERE (h1.nombre="Linux")),
+((h2:Habilidad) WHERE (h2.nombre="BASH"))
+MERGE (u)-[:ENDOSA]->(h1)
+MERGE (u)-[:ENDOSA]->(h2);
+
+MATCH((u: Usuario) WHERE (u.nombre_usuario="juanp")),
+((h1:Habilidad) WHERE (h1.nombre="Java")),
+((h2:Habilidad) WHERE (h2.nombre="BASH"))
+MERGE (u)-[:ENDOSA]->(h1)
+MERGE (u)-[:ENDOSA]->(h2);
+
+
+-- CONSULTAS:
+
+MATCH(u1:Usuario)-[r:CONOCE]->(u2:Usuario) 
+RETURN u1.nombre_usuario AS Nombre_Usuario, count(*) AS Conexiones ORDER BY Conexiones DESC;
+
+MATCH(u1:Usuario)-[r:PUBLICÓ]->(p:Post) 
+RETURN u1.nombre_usuario AS Nombre_Usuario, count(*) AS Publicaciones 
+ORDER BY Publicaciones DESC LIMIT 2;
+
+MATCH(u1:Usuario)-[r:ENDOSA]->(h:Habilidad) 
+RETURN h.nombre AS Nombre_Habilidad, count(*) AS Endosos ORDER BY Endosos DESC;
+
+MATCH (h:Habilidad)
+WHERE NOT EXISTS {
+  MATCH (:Usuario {nombre_usuario: 'juanp'})-[:ENDOSA]->(h)
+}
+RETURN h.nombre AS Habilidad_Sin_Endosar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ejercicio 4
+
+-- REQUISITOS:
+
+
+
+Modelar un sistema académico que contemple: 
+- Estudiantes inscritos en Cursos . 
+- Cada curso corresponde a una Materia . 
+- Los estudiantes obtienen calificaciones finales. 
+- Las materias pueden tener prerrequisitos.
+
+-- ACTIVIDADES:
+
+Modelado - Crear datos de:
+
+    3 estudiantes.
+    3 materias (al menos una con prerrequisito).
+    4 cursos dictados.
+    Inscripciones y calificaciones.
+
+Consultas 
+- Listar la transcripción académica de un estudiante. 
+- Verificar si un estudiante puede inscribirse en una materia (si aprobó los prerrequisitos). 
+- Calcular el promedio de calificaciones por estudiante. 
+- Detectar materias con promedio inferior a 7.
+
+-- MODELADO:
+
+CREATE (e1:Estudiante {legajo: 10897, nombre: "Ana"}),
+       (e2:Estudiante {legajo: 8970, nombre: "Carlos"}),
+       (e3:Estudiante {legajo: 3313, nombre: "Lucía"});
+
+CREATE (mat1:Materia {id: "MAT101", nombre: "Matemática I"}),
+       (mat2:Materia {id: "MAT102", nombre: "Matemática II"}),
+       (mat3:Materia {id: "FIS101", nombre: "Física I"});
+
+MATCH((m1:Materia) WHERE (m1.id="MAT101")), ((m2:Materia) WHERE (m2.id="MAT102"))
+MERGE(m1)-[r:PRERREQUISITO_DE]->(m2);
+
+CREATE (curso1:Curso {nombre: "C1", anio: 2023}),
+       (curso2:Curso {nombre: "C2", anio: 2023}),
+       (curso3:Curso {nombre: "C3", anio: 2024}),
+       (curso4:Curso {nombre: "C4", anio: 2024});
+
+MATCH((e:Estudiante) WHERE (e.legajo=10897)), 
+((c1:Curso) WHERE c1.nombre="C1"),
+((c2:Curso) WHERE c2.nombre="C2")
+MERGE(e)-[:INSCRIPTO_EN {nota: 9}]->(c1)
+MERGE(e)-[:INSCRIPTO_EN {nota: 8}]->(c2);
+
+MATCH((e:Estudiante) WHERE (e.legajo=8970)), 
+((c1:Curso) WHERE c1.nombre="C3"),
+((c2:Curso) WHERE c2.nombre="C4")
+MERGE(e)-[:INSCRIPTO_EN {nota: 6}]->(c1)
+MERGE(e)-[:INSCRIPTO_EN {nota: 8}]->(c2);
+
+MATCH((e:Estudiante) WHERE (e.legajo=3313)), 
+((c1:Curso) WHERE c1.nombre="C1"),
+((c2:Curso) WHERE c2.nombre="C4")
+MERGE(e)-[:INSCRIPTO_EN {nota: 6}]->(c1)
+MERGE(e)-[:INSCRIPTO_EN {nota: 6}]->(c2);
+
+MATCH((c:Curso) WHERE (c.nombre="C1")),
+((m:Materia) WHERE (m.id="MAT101"))
+MERGE(c)-[r:CORRESPONDE_A]->(m);
+
+MATCH((c:Curso) WHERE (c.nombre="C2")),
+((m:Materia) WHERE (m.id="MAT101"))
+MERGE(c)-[r:CORRESPONDE_A]->(m);
+
+MATCH((c:Curso) WHERE (c.nombre="C3")),
+((m:Materia) WHERE (m.id="MAT102"))
+MERGE(c)-[r:CORRESPONDE_A]->(m);
+
+MATCH((c:Curso) WHERE (c.nombre="C4")),
+((m:Materia) WHERE (m.id="FIS101"))
+MERGE(c)-[r:CORRESPONDE_A]->(m);
+
+
+-- CONSULTAS:
+
+MATCH(e:Estudiante)-[r:INSCRIPTO_EN]->(c:Curso)
+RETURN e.nombre AS Nombre_Estudiante, c.nombre AS Nombre_Curso, r.nota AS Nota_Curso
+
+MATCH(e:Estudiante)-[r:INSCRIPTO_EN]->(c:Curso) WHERE c.nombre="C1"
+
+MATCH(e:Estudiante)-[r:INSCRIPTO_EN]->(c:Curso) 
+RETURN e.nombre AS Nombre_Estudiante, ((SUM(r.nota))/count(*)) AS Promedio_Calificaciones;
+
+MATCH (m:Materia {id: 'MAT102'})<-[:PRERREQUISITO_DE]-(prerreq)<-[:CORRESPONDE_A]-(c:Curso)<-[:INSCRIPTO_EN]-(e:Estudiante {legajo: 10897})
+WHERE NOT EXISTS {
+  MATCH (e)-[r:INSCRIPTO_EN]->(:Curso)-[:CORRESPONDE_A]->(prerreq)
+  WHERE NOT r.nota >= 6
+}
+RETURN e.nombre AS Nombre_Estudiante, m.id AS materia_destino, 
+prerreq.id AS prerrequisito, true AS puede_inscribirse;
+
+
+
+
+
+
